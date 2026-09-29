@@ -16,35 +16,6 @@ Online: <https://annalzrv.github.io/tinyCPU/>
 - Click a row in the trace to jump to that moment.
 - `⌘/Ctrl + Enter` steps, `⇧ ⌘/Ctrl + Enter` runs to the end.
 
-## The machine
-
-Four registers `R0`–`R3`, 240 memory cells, four flags `ZF SF CF OF`, and two ports: `[INPUT]` reads the next number, `[OUTPUT]` prints one.
-
-```asm
-LOAD R0, [INPUT]
-LOAD R1, [INPUT]
-ADD R0, R1
-STORE [OUTPUT], R0
-HALT
-```
-
-Decisions are `CMP a, b` followed by a jump: `JE JNE JL JLE JG JGE`. Jumps go to labels written `name:`.
-
-```asm
-loop: CMP R0, 0
-JLE done
-ADD R1, R0
-SUB R0, 1
-JMP loop
-done: STORE [OUTPUT], R1
-HALT
-```
-
-
-## Examples
-
-`sum` · `max` · `abs_ifelse` · `sign_ifelse` · `sum_1_to_n` · `multiply` · `factorial` · `reverse` · `bubble_sort`
-
 ## Command line
 
 The course's Python emulator, which the tracer matches. Python 3.11+.
