@@ -98,7 +98,6 @@
   .brand { display: flex; align-items: center; gap: 10px; margin-right: auto; }
   .brand .mark { width: 30px; height: 30px; border-radius: 9px; background: var(--lg-accent); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-family: var(--mono); font-weight: 700; font-size: 13px; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 18px -6px rgba(255,79,46,.6); }
   .brand h1 { font-size: 17px; font-weight: 700; margin: 0; letter-spacing: -.015em; }
-  .brand .spec { color: var(--lg-text-3); font-size: 11px; font-family: var(--mono); }
   .field { display: flex; align-items: center; gap: 8px; }
   .field label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--lg-text-3); font-weight: 600; }
   .field input, .field select {
@@ -196,19 +195,6 @@
   .reg.chg { background: var(--lg-accent-soft); border-color: rgba(255,79,46,.4); box-shadow: 0 8px 24px -12px rgba(255,79,46,.5), inset 0 1px 0 var(--lg-highlight); }
   .reg.chg .val { color: var(--lg-accent-deep); }
 
-  .flags { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .flag { border: 1px solid var(--lg-stroke-2); border-radius: var(--lg-r-md); padding: 7px 9px; display: flex; flex-direction: column; gap: 2px; background: var(--lg-field); transition: background .3s var(--lg-ease); }
-  .flag .n { font-family: var(--mono); font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
-  .flag .n::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--lg-text-3); }
-  .flag .m { font-size: 11px; color: var(--lg-text-2); }
-  .flag.on { background: var(--lg-ok-soft); border-color: rgba(47,180,107,.4); }
-  .flag.on .n::before { background: var(--lg-ok); box-shadow: 0 0 0 3px rgba(47,180,107,.25); }
-  .flag.chg .n { color: var(--lg-accent-deep); }
-
-  .jumps { display: flex; flex-wrap: wrap; gap: 6px; }
-  .jump { font-family: var(--mono); font-size: 12px; height: 24px; display: inline-flex; align-items: center; padding: 0 9px; border-radius: 999px; border: 1px solid var(--lg-stroke-2); color: var(--lg-text-3); background: var(--lg-field); }
-  .jump.on { color: var(--lg-ok-deep); border-color: rgba(47,180,107,.4); background: var(--lg-ok-soft); font-weight: 700; }
-
 
   .inputfield { width: 100%; height: 36px; font-size: 14px; padding: 0 12px; background: var(--lg-field); border: 1px solid var(--lg-field-stroke); border-radius: var(--lg-r-sm); outline: none; -webkit-appearance: none; appearance: none; transition: border-color .2s, box-shadow .2s; }
   .iolabel { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--lg-text-3); font-weight: 700; margin-top: 2px; }
@@ -303,7 +289,6 @@
   <div class="brand">
     <span class="mark">µ</span>
     <h1>TinyCPU Workbench</h1>
-    <span class="spec">32-bit · R0–R3 · ZF SF CF OF · mem 0–239</span>
   </div>
   <div class="field">
     <label for="example">Example</label>
@@ -349,11 +334,6 @@
         <span class="ins none" id="nextins">—</span>
       </div>
       <div class="regs" id="regs"></div>
-    </div>
-    <div class="panel">
-      <h2>Flags <span class="sub">after the last ADD / SUB / CMP</span></h2>
-      <div class="flags" id="flags"></div>
-      <div class="jumps" id="jumps" title="Which conditional jumps would be taken with the current flags"></div>
     </div>
     <div class="panel">
       <h2>Ports</h2>
@@ -711,7 +691,7 @@ HALT` },
     src: $("src"), backdrop: $("backdrop"), gutter: $("gutter"), input: $("input"), limit: $("limit"),
     example: $("example"), pill: $("pill"), msg: $("msg"), back: $("back"), step: $("step"), run: $("run"),
     runend: $("runend"), reset: $("reset"), speed: $("speed"), speedlbl: $("speedlbl"), file: $("file"),
-    pc: $("pc"), pcline: $("pcline"), nextins: $("nextins"), regs: $("regs"), flags: $("flags"), jumps: $("jumps"),
+    pc: $("pc"), pcline: $("pcline"), nextins: $("nextins"), regs: $("regs"), 
     output: $("output"), mem: $("mem"), tbody: $("tbody"),
     tracecount: $("tracecount"), traceempty: $("traceempty"), changesonly: $("changesonly"),
   };
@@ -824,7 +804,7 @@ HALT` },
 
   // ---------- rendering ----------
   function renderAll() {
-    renderEditorMarks(); renderStatus(); renderExec(); renderFlags(); renderIO(); renderMem(); renderTrace();
+    renderEditorMarks(); renderStatus(); renderExec(); renderIO(); renderMem(); renderTrace();
   }
 
   function renderStatus() {
@@ -875,15 +855,6 @@ HALT` },
     const prev = lastInfo && history.length ? history[history.length - 1].regs : regs;
     el.regs.innerHTML = regs.map((v, i) =>
       `<div class="reg${v !== prev[i] ? " chg" : ""}"><div class="name">R${i}</div><div class="val">${v}</div><div class="hex">${hex(v)}</div></div>`).join("");
-  }
-
-  function renderFlags() {
-    const f = cpu ? cpu.flags : { ZF: false, SF: false, CF: false, OF: false };
-    const pf = lastInfo && history.length ? history[history.length - 1].flags : f;
-    el.flags.innerHTML = Object.keys(f).map(k =>
-      `<div class="flag${f[k] ? " on" : ""}${f[k] !== pf[k] ? " chg" : ""}"><div class="n">${k} <span>${f[k] ? 1 : 0}</span></div><div class="m">${FLAG_MEANING[k]}</div></div>`).join("");
-    el.jumps.innerHTML = Object.entries(JUMP_COND).map(([j, [cond, fn]]) =>
-      `<span class="jump${fn(f) ? " on" : ""}" title="${j}: taken when ${cond}">${j}</span>`).join("");
   }
 
   function renderIO() {
