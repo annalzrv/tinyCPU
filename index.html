@@ -1,0 +1,1025 @@
+<title>TinyCPU Workbench</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+  /* ===== Liquid Glass tokens (inlined from liquid-glass-ui/css/liquid-glass.css, no dependencies) ===== */
+  :root {
+    --lg-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, system-ui, "Segoe UI", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --lg-text: #0b0b0f; --lg-text-2: rgba(11,11,15,.62); --lg-text-3: rgba(11,11,15,.40);
+    --lg-accent: #ff4f2e; --lg-accent-soft: rgba(255,79,46,.14); --lg-accent-ink: #ffffff; --lg-accent-deep: #b8321a;
+    --lg-ok: #2fb46b; --lg-ok-soft: rgba(47,180,107,.16); --lg-ok-deep: #1d7d49;
+    --lg-warn: #f4a11d; --lg-bad: #e0362f; --lg-bad-soft: rgba(224,54,47,.14);
+    --lg-page: #e9eef6;
+    --lg-glass: rgba(255,255,255,.58); --lg-glass-strong: rgba(255,255,255,.78); --lg-glass-hover: rgba(255,255,255,.72);
+    --lg-stroke: rgba(255,255,255,.85); --lg-stroke-2: rgba(11,11,15,.08); --lg-highlight: rgba(255,255,255,.95);
+    --lg-shadow: 0 1px 2px rgba(15,15,30,.04), 0 12px 40px -12px rgba(15,15,30,.18);
+    --lg-shadow-lift: 0 2px 6px rgba(15,15,30,.06), 0 24px 60px -16px rgba(15,15,30,.28);
+    --lg-field: rgba(255,255,255,.62); --lg-field-stroke: rgba(11,11,15,.10);
+    --lg-inset: rgba(11,11,15,.045); --lg-inset-2: rgba(11,11,15,.09);
+    --lg-blob-1: #9fd3e6; --lg-blob-2: #b7c4ff; --lg-blob-3: #cfeedd;
+    --lg-r-xl: 28px; --lg-r-lg: 20px; --lg-r-md: 14px; --lg-r-sm: 10px;
+    --lg-ease: cubic-bezier(.2,.8,.2,1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --lg-text: #f5f5f7; --lg-text-2: rgba(245,245,247,.64); --lg-text-3: rgba(245,245,247,.42);
+      --lg-accent: #ff6a4a; --lg-accent-soft: rgba(255,106,74,.18); --lg-accent-deep: #ffb09d;
+      --lg-ok: #3ec97e; --lg-ok-soft: rgba(62,201,126,.18); --lg-ok-deep: #8ee8b4;
+      --lg-bad: #ff6b63; --lg-bad-soft: rgba(255,107,99,.16);
+      --lg-page: #0b0f16;
+      --lg-glass: rgba(28,28,36,.55); --lg-glass-strong: rgba(34,34,44,.78); --lg-glass-hover: rgba(40,40,52,.66);
+      --lg-stroke: rgba(255,255,255,.12); --lg-stroke-2: rgba(255,255,255,.08); --lg-highlight: rgba(255,255,255,.10);
+      --lg-shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 48px -12px rgba(0,0,0,.6);
+      --lg-shadow-lift: 0 2px 6px rgba(0,0,0,.4), 0 28px 70px -16px rgba(0,0,0,.7);
+      --lg-field: rgba(255,255,255,.06); --lg-field-stroke: rgba(255,255,255,.12);
+      --lg-inset: rgba(255,255,255,.05); --lg-inset-2: rgba(255,255,255,.10);
+      --lg-blob-1: #123e4d; --lg-blob-2: #1f2a5e; --lg-blob-3: #1c4a3c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --lg-text: #f5f5f7; --lg-text-2: rgba(245,245,247,.64); --lg-text-3: rgba(245,245,247,.42);
+    --lg-accent: #ff6a4a; --lg-accent-soft: rgba(255,106,74,.18); --lg-accent-deep: #ffb09d;
+    --lg-ok: #3ec97e; --lg-ok-soft: rgba(62,201,126,.18); --lg-ok-deep: #8ee8b4;
+    --lg-bad: #ff6b63; --lg-bad-soft: rgba(255,107,99,.16);
+    --lg-page: #0b0f16;
+    --lg-glass: rgba(28,28,36,.55); --lg-glass-strong: rgba(34,34,44,.78); --lg-glass-hover: rgba(40,40,52,.66);
+    --lg-stroke: rgba(255,255,255,.12); --lg-stroke-2: rgba(255,255,255,.08); --lg-highlight: rgba(255,255,255,.10);
+    --lg-shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 48px -12px rgba(0,0,0,.6);
+    --lg-shadow-lift: 0 2px 6px rgba(0,0,0,.4), 0 28px 70px -16px rgba(0,0,0,.7);
+    --lg-field: rgba(255,255,255,.06); --lg-field-stroke: rgba(255,255,255,.12);
+    --lg-inset: rgba(255,255,255,.05); --lg-inset-2: rgba(255,255,255,.10);
+    --lg-blob-1: #123e4d; --lg-blob-2: #1f2a5e; --lg-blob-3: #1c4a3c;
+  }
+
+  /* the tracer's own semantic names, mapped onto the glass tokens */
+  :root {
+    --bg: var(--lg-page); --ink: var(--lg-text); --muted: var(--lg-text-2); --faint: var(--lg-text-3);
+    --line: var(--lg-stroke-2); --panel-2: var(--lg-inset); --sel: var(--lg-inset-2);
+    --accent: var(--lg-accent); --accent-ink: var(--lg-accent-deep); --accent-soft: var(--lg-accent-soft); --accent-line: rgba(255,79,46,.35);
+    --ok: var(--lg-ok-deep); --ok-soft: var(--lg-ok-soft); --bad: var(--lg-bad); --bad-soft: var(--lg-bad-soft);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--lg-page); color: var(--lg-text); font-family: var(--lg-font);
+    font-size: 14px; line-height: 1.45; letter-spacing: -.005em; -webkit-font-smoothing: antialiased;
+    padding-inline: 16px; padding-block: 12px 28px;
+  }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--lg-accent); outline-offset: 2px; }
+  .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+  /* ambient mesh the glass refracts */
+  .lg-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .lg-bg::before, .lg-bg::after, .lg-bg > span { content: ""; position: absolute; border-radius: 50%; filter: blur(90px); opacity: .9; will-change: transform; }
+  .lg-bg::before { width: 60vw; height: 60vw; left: -18vw; top: -22vw; background: var(--lg-blob-1); animation: lgDrift1 26s ease-in-out infinite alternate; }
+  .lg-bg::after { width: 55vw; height: 55vw; right: -16vw; top: 8vh; background: var(--lg-blob-2); animation: lgDrift2 32s ease-in-out infinite alternate; }
+  .lg-bg > span { width: 50vw; height: 50vw; left: 22vw; bottom: -28vw; background: var(--lg-blob-3); animation: lgDrift3 38s ease-in-out infinite alternate; }
+  @keyframes lgDrift1 { to { transform: translate(8vw, 6vh) scale(1.08); } }
+  @keyframes lgDrift2 { to { transform: translate(-6vw, 10vh) scale(.94); } }
+  @keyframes lgDrift3 { to { transform: translate(-10vw, -6vh) scale(1.06); } }
+  header, .status, main, .trace, .ref { position: relative; z-index: 1; }
+
+  /* glass surface recipe */
+  .glass {
+    background: var(--lg-glass); -webkit-backdrop-filter: blur(28px) saturate(180%); backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid var(--lg-stroke); box-shadow: var(--lg-shadow), inset 0 1px 0 var(--lg-highlight);
+  }
+
+  /* ---------- top bar: floating pill ---------- */
+  .top {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
+    padding: 10px 12px 10px 20px; border-radius: 999px; margin-bottom: 14px;
+    background: var(--lg-glass); -webkit-backdrop-filter: blur(28px) saturate(180%); backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid var(--lg-stroke); box-shadow: var(--lg-shadow), inset 0 1px 0 var(--lg-highlight);
+  }
+  @media (max-width: 720px) { .top { border-radius: var(--lg-r-lg); } }
+  .brand { display: flex; align-items: center; gap: 10px; margin-right: auto; }
+  .brand .mark { width: 30px; height: 30px; border-radius: 9px; background: var(--lg-accent); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-family: var(--mono); font-weight: 700; font-size: 13px; box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 18px -6px rgba(255,79,46,.6); }
+  .brand h1 { font-size: 17px; font-weight: 700; margin: 0; letter-spacing: -.015em; }
+  .brand .spec { color: var(--lg-text-3); font-size: 11px; font-family: var(--mono); }
+  .field { display: flex; align-items: center; gap: 8px; }
+  .field label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--lg-text-3); font-weight: 600; }
+  .field input, .field select {
+    background: var(--lg-field); border: 1px solid var(--lg-field-stroke); border-radius: var(--lg-r-sm);
+    padding: 0 12px; height: 34px; outline: none; -webkit-appearance: none; appearance: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--lg-accent); box-shadow: 0 0 0 4px var(--lg-accent-soft); }
+  .field select { padding-right: 30px; background-image: linear-gradient(45deg, transparent 50%, var(--lg-text-3) 50%), linear-gradient(135deg, var(--lg-text-3) 50%, transparent 50%); background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; }
+  .field input.mono { width: 150px; }
+  .field input.num { width: 84px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 34px; padding: 0 14px;
+    border-radius: var(--lg-r-sm); font-size: 13px; font-weight: 600; letter-spacing: -.01em; cursor: pointer; white-space: nowrap;
+    background: var(--lg-glass); border: 1px solid var(--lg-stroke); color: var(--lg-text);
+    -webkit-backdrop-filter: blur(20px) saturate(160%); backdrop-filter: blur(20px) saturate(160%);
+    box-shadow: inset 0 1px 0 var(--lg-highlight); -webkit-tap-highlight-color: transparent;
+    transition: transform .25s var(--lg-ease), background .25s var(--lg-ease), box-shadow .25s var(--lg-ease), opacity .2s;
+  }
+  .btn:hover:not(:disabled) { background: var(--lg-glass-hover); }
+  .btn:active:not(:disabled) { transform: scale(.97); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+  .btn.primary { background: var(--lg-accent); border-color: transparent; color: var(--lg-accent-ink); box-shadow: 0 8px 24px -8px rgba(255,79,46,.6), inset 0 1px 0 rgba(255,255,255,.35); }
+  .btn.primary:hover:not(:disabled) { filter: brightness(1.05); box-shadow: 0 12px 30px -8px rgba(255,79,46,.7), inset 0 1px 0 rgba(255,255,255,.35); }
+  .btn kbd { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--lg-text-3); border: 1px solid var(--lg-stroke-2); border-radius: 5px; padding: 0 4px; }
+  .btn.primary kbd { color: rgba(255,255,255,.85); border-color: rgba(255,255,255,.4); }
+  .speed { display: flex; align-items: center; gap: 6px; color: var(--lg-text-2); font-size: 12px; }
+  .speed input { width: 90px; accent-color: var(--lg-accent); }
+  .filebtn { position: relative; overflow: hidden; }
+  .filebtn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .themebtn { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 5; }
+
+  /* ---------- status ---------- */
+  .status { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-bottom: 14px; min-height: 34px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 12px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; letter-spacing: .01em; background: var(--lg-field); border: 1px solid var(--lg-stroke-2);
+  }
+  .pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--lg-text-3); }
+  .pill.running::before { background: var(--lg-accent); box-shadow: 0 0 0 3px var(--lg-accent-soft); }
+  .pill.halted { background: var(--lg-ok-soft); }
+  .pill.halted::before { background: var(--lg-ok); }
+  .pill.error { background: var(--lg-bad-soft); color: var(--lg-bad); }
+  .pill.error::before { background: var(--lg-bad); }
+  .status .msg { color: var(--lg-text-2); font-size: 13px; }
+  .status .msg.err { color: var(--lg-bad); }
+
+  /* ---------- bench grid ---------- */
+  .bench { display: grid; gap: 14px; grid-template-columns: minmax(300px, 1.15fr) minmax(300px, 1fr) minmax(320px, 1fr); align-items: stretch; }
+  @media (max-width: 1120px) { .bench { grid-template-columns: 1fr 1fr; } .bench > .col-mem { grid-column: 1 / -1; } }
+  @media (max-width: 720px) { .bench { grid-template-columns: 1fr; } .bench > .col-mem { grid-column: auto; } }
+
+  .panel {
+    background: var(--lg-glass-strong); -webkit-backdrop-filter: blur(28px) saturate(180%); backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid var(--lg-stroke); border-radius: var(--lg-r-lg); box-shadow: var(--lg-shadow), inset 0 1px 0 var(--lg-highlight);
+    padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0;
+  }
+  .panel h2 { margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--lg-text-3); font-weight: 600; display: flex; align-items: baseline; gap: 8px; }
+  .panel h2 .sub { text-transform: none; letter-spacing: 0; font-weight: 400; font-family: var(--mono); color: var(--lg-text-3); }
+  .col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+  /* ---------- editor ---------- */
+  .editor { display: grid; grid-template-columns: 44px 1fr; border: 1px solid var(--lg-field-stroke); border-radius: var(--lg-r-md); overflow: hidden; background: var(--lg-field); min-height: 340px; flex: 1; }
+  .gutter { font-family: var(--mono); font-size: 13px; line-height: 20px; padding: 10px 0; color: var(--lg-text-3); text-align: right; overflow: hidden; user-select: none; position: relative; border-right: 1px solid var(--lg-stroke-2); }
+  .gutter .g { padding-right: 8px; height: 20px; position: relative; }
+  .gutter .g.pc { color: var(--lg-accent-deep); font-weight: 700; background: var(--lg-accent-soft); }
+  .gutter .g.pc::before { content: "▶"; position: absolute; left: 6px; font-size: 9px; top: 0; color: var(--lg-accent); }
+  .gutter .g.err { color: var(--lg-bad); font-weight: 700; background: var(--lg-bad-soft); }
+  .gutter .g.err::before { content: "!"; position: absolute; left: 8px; top: 0; color: var(--lg-bad); }
+  .code-wrap { position: relative; min-width: 0; }
+  .backdrop, .code-wrap textarea { font-family: var(--mono); font-size: 13px; line-height: 20px; padding: 10px 12px; white-space: pre; margin: 0; tab-size: 4; }
+  .backdrop { position: absolute; inset: 0; overflow: hidden; color: transparent; pointer-events: none; }
+  .backdrop .ln { display: block; height: 20px; }
+  .backdrop .ln.pc { background: var(--lg-accent-soft); box-shadow: inset 3px 0 0 var(--lg-accent); }
+  .backdrop .ln.err { background: var(--lg-bad-soft); box-shadow: inset 3px 0 0 var(--lg-bad); }
+  .code-wrap textarea { position: absolute; inset: 0; width: 100%; height: 100%; background: transparent; border: 0; resize: none; outline: none; color: var(--lg-text); overflow: auto; caret-color: var(--lg-accent); }
+  .code-wrap textarea::placeholder { color: var(--lg-text-3); }
+  .hint { color: var(--lg-text-2); font-size: 12px; }
+  .hint code, .ref .tip code { font-family: var(--mono); background: var(--lg-inset-2); padding: 0 5px; border-radius: 5px; }
+
+  /* ---------- CPU state ---------- */
+  .pcline { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .pcline .big { font-family: var(--mono); font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+  .pcline .big small { font-size: 12px; color: var(--lg-text-2); font-weight: 400; margin-left: 4px; }
+  .pcline .ins { font-family: var(--mono); font-size: 12.5px; color: var(--lg-accent-deep); background: var(--lg-accent-soft); padding: 3px 10px; border-radius: 999px; border: 1px solid transparent; }
+  .pcline .ins.none { color: var(--lg-text-2); background: var(--lg-field); border-color: var(--lg-stroke-2); }
+
+  .regs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  @media (max-width: 380px) { .regs { grid-template-columns: repeat(2, 1fr); } }
+  .reg { border: 1px solid var(--lg-stroke-2); border-radius: var(--lg-r-md); padding: 9px 11px; background: var(--lg-field); min-width: 0; transition: background .3s var(--lg-ease), border-color .3s, box-shadow .3s; box-shadow: inset 0 1px 0 var(--lg-highlight); }
+  .reg .name { font-size: 11px; color: var(--lg-text-3); letter-spacing: .06em; font-weight: 700; }
+  .reg .val { font-family: var(--mono); font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; letter-spacing: -.01em; }
+  .reg .hex { font-family: var(--mono); font-size: 11px; color: var(--lg-text-3); }
+  .reg.chg { background: var(--lg-accent-soft); border-color: rgba(255,79,46,.4); box-shadow: 0 8px 24px -12px rgba(255,79,46,.5), inset 0 1px 0 var(--lg-highlight); }
+  .reg.chg .val { color: var(--lg-accent-deep); }
+
+  .flags { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .flag { border: 1px solid var(--lg-stroke-2); border-radius: var(--lg-r-md); padding: 7px 9px; display: flex; flex-direction: column; gap: 2px; background: var(--lg-field); transition: background .3s var(--lg-ease); }
+  .flag .n { font-family: var(--mono); font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .flag .n::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--lg-text-3); }
+  .flag .m { font-size: 11px; color: var(--lg-text-2); }
+  .flag.on { background: var(--lg-ok-soft); border-color: rgba(47,180,107,.4); }
+  .flag.on .n::before { background: var(--lg-ok); box-shadow: 0 0 0 3px rgba(47,180,107,.25); }
+  .flag.chg .n { color: var(--lg-accent-deep); }
+
+  .jumps { display: flex; flex-wrap: wrap; gap: 6px; }
+  .jump { font-family: var(--mono); font-size: 12px; height: 24px; display: inline-flex; align-items: center; padding: 0 9px; border-radius: 999px; border: 1px solid var(--lg-stroke-2); color: var(--lg-text-3); background: var(--lg-field); }
+  .jump.on { color: var(--lg-ok-deep); border-color: rgba(47,180,107,.4); background: var(--lg-ok-soft); font-weight: 700; }
+
+  .io { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 380px) { .io { grid-template-columns: 1fr; } }
+  .io h3 { margin: 0 0 6px; font-size: 11px; color: var(--lg-text-3); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .io h3 .addr { font-family: var(--mono); font-weight: 400; letter-spacing: 0; text-transform: none; }
+  .queue { display: flex; flex-wrap: wrap; gap: 4px; min-height: 26px; }
+  .tok { font-family: var(--mono); font-size: 12px; height: 24px; display: inline-flex; align-items: center; padding: 0 8px; border-radius: 999px; border: 1px solid var(--lg-stroke-2); background: var(--lg-field); }
+  .tok.used { color: var(--lg-text-3); text-decoration: line-through; border-style: dashed; }
+  .tok.next { border-color: rgba(255,79,46,.4); color: var(--lg-accent-deep); background: var(--lg-accent-soft); }
+  .tok.new { border-color: rgba(47,180,107,.4); color: var(--lg-ok-deep); background: var(--lg-ok-soft); font-weight: 700; }
+  .queue .empty { color: var(--lg-text-3); font-size: 12px; align-self: center; }
+  .answer { font-family: var(--mono); font-size: 12px; color: var(--lg-text-2); }
+  .answer b { color: var(--lg-text); font-weight: 700; }
+
+  .inputfield { width: 100%; height: 36px; font-size: 14px; padding: 0 12px; background: var(--lg-field); border: 1px solid var(--lg-field-stroke); border-radius: var(--lg-r-sm); outline: none; -webkit-appearance: none; appearance: none; transition: border-color .2s, box-shadow .2s; }
+  .inputfield:focus { border-color: var(--lg-accent); box-shadow: 0 0 0 4px var(--lg-accent-soft); }
+
+  /* ---------- memory ---------- */
+  .memwrap { overflow-x: auto; }
+  .mem { display: grid; grid-template-columns: 40px repeat(16, minmax(30px, 1fr)); gap: 2px; font-family: var(--mono); font-size: 11px; min-width: 560px; }
+  .mem .h { color: var(--lg-text-3); text-align: center; padding-bottom: 2px; font-size: 10px; }
+  .mem .a { color: var(--lg-text-3); text-align: right; padding-right: 6px; line-height: 22px; font-size: 10px; }
+  .mem .c { background: var(--lg-inset); border-radius: 5px; text-align: center; line-height: 22px; height: 22px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--lg-text-3); transition: background .3s var(--lg-ease); }
+  .mem .c.nz { color: var(--lg-text); background: var(--lg-inset-2); font-weight: 600; }
+  .mem .c.hot { background: var(--lg-accent); color: #fff; font-weight: 700; box-shadow: 0 6px 16px -6px rgba(255,79,46,.7); }
+  .mem .c.ptr { box-shadow: inset 0 0 0 1.5px var(--lg-ok); }
+  .memlegend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 11px; color: var(--lg-text-2); }
+  .memlegend span { display: inline-flex; align-items: center; gap: 5px; }
+  .memlegend i { width: 12px; height: 12px; border-radius: 4px; display: inline-block; background: var(--lg-inset-2); }
+  .memlegend i.hot { background: var(--lg-accent); }
+  .memlegend i.ptr { box-shadow: inset 0 0 0 1.5px var(--lg-ok); background: var(--lg-inset); }
+  .ports { display: flex; gap: 8px; flex-wrap: wrap; font-family: var(--mono); font-size: 11px; color: var(--lg-text-2); }
+  .ports span { border: 1px dashed var(--lg-stroke-2); border-radius: 999px; padding: 2px 10px; }
+
+  /* ---------- trace ---------- */
+  .trace { margin-top: 14px; }
+  .trace .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+  .trace .bar label { display: inline-flex; align-items: center; gap: 6px; color: var(--lg-text-2); font-size: 12px; cursor: pointer; }
+  .trace .bar input { accent-color: var(--lg-accent); }
+  .tracewrap { overflow: auto; max-height: 42vh; border: 1px solid var(--lg-stroke-2); border-radius: var(--lg-r-md); background: var(--lg-field); }
+  .tracewrap::-webkit-scrollbar { width: 8px; height: 8px; }
+  .tracewrap::-webkit-scrollbar-thumb { background: var(--lg-inset-2); border-radius: 8px; }
+  table.tr { border-collapse: separate; border-spacing: 0; width: 100%; font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+  table.tr th { position: sticky; top: 0; background: var(--lg-glass-strong); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: var(--lg-text-2); font-weight: 700; text-align: right; padding: 7px 8px; border-bottom: 1px solid var(--lg-stroke-2); font-size: 11px; letter-spacing: .04em; z-index: 1; }
+  table.tr th.l, table.tr td.l { text-align: left; }
+  table.tr td { padding: 4px 8px; text-align: right; border-bottom: 1px solid var(--lg-stroke-2); white-space: nowrap; cursor: pointer; }
+  table.tr tr:hover td { background: var(--lg-inset); }
+  table.tr tr.cur td { background: var(--lg-accent-soft); }
+  table.tr td.chg { color: var(--lg-accent-deep); font-weight: 700; background: rgba(255,79,46,.10); }
+  table.tr td.dim { color: var(--lg-text-3); }
+  table.tr td.f { width: 22px; text-align: center; padding-inline: 4px; }
+  table.tr td.f.on { color: var(--lg-ok-deep); font-weight: 700; }
+  table.tr td.out { color: var(--lg-ok-deep); font-weight: 700; text-align: left; }
+  table.tr td.memw { color: var(--lg-text-2); text-align: left; }
+  table.tr tr.errrow td { color: var(--lg-bad); background: var(--lg-bad-soft); }
+  .trace .note { color: var(--lg-text-3); font-size: 12px; }
+  .trace .empty { color: var(--lg-text-3); padding: 14px; font-size: 13px; }
+
+  /* ---------- reference ---------- */
+  .ref { margin-top: 14px; }
+  .refgrid { display: grid; grid-template-columns: 1.4fr 1fr 1.1fr; gap: 18px; }
+  @media (max-width: 980px) { .refgrid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 640px) { .refgrid { grid-template-columns: 1fr; } }
+  .refgrid + .refgrid { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--lg-stroke-2); }
+  .refgrid.two { grid-template-columns: 1fr 1.4fr; }
+  @media (max-width: 800px) { .refgrid.two { grid-template-columns: 1fr; } }
+  .ref h3 { margin: 0 0 6px; font-size: 11px; color: var(--lg-text-3); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .ref h3 span { font-weight: 400; letter-spacing: 0; text-transform: none; }
+  table.rt { border-collapse: collapse; width: 100%; font-size: 12px; }
+  table.rt td { padding: 4px 8px 4px 0; vertical-align: top; border-bottom: 1px solid var(--lg-stroke-2); }
+  table.rt tr:last-child td { border-bottom: 0; }
+  table.rt td.k { font-family: var(--mono); white-space: nowrap; font-weight: 600; }
+  table.rt td.c { font-family: var(--mono); color: var(--lg-text-2); white-space: nowrap; }
+  table.rt td.d { color: var(--lg-text-2); }
+  table.rt td.d b { color: var(--lg-text); }
+  table.rt tr.grp td { padding-top: 8px; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--lg-text-3); border-bottom: 0; }
+  .ref .tip { color: var(--lg-text-2); font-size: 12px; margin-top: 8px; }
+  .pat { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+  .pat pre { margin: 0; font-family: var(--mono); font-size: 11.5px; line-height: 1.5; background: var(--lg-field); border: 1px solid var(--lg-stroke-2); border-radius: var(--lg-r-sm); padding: 8px 10px; overflow-x: auto; }
+  .pat pre b { color: var(--lg-accent-deep); font-weight: 700; }
+  .pat pre i { color: var(--lg-text-3); font-style: normal; }
+  .pat .pt { font-size: 11px; color: var(--lg-text-2); margin-bottom: 4px; font-weight: 700; }
+
+  details.ref > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  details.ref > summary::-webkit-details-marker { display: none; }
+  details.ref > summary::before { content: "▸"; color: var(--lg-text-3); font-size: 12px; transition: transform .25s var(--lg-ease); }
+  details.ref[open] > summary::before { transform: rotate(90deg); }
+  details.ref > summary h2 { margin: 0; }
+  details.ref:not([open]) { gap: 0; }
+  .ref .tip { margin-top: 10px; }
+
+  /* entrance */
+  @keyframes lgIn { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: none; } }
+  .top, .bench > *, .trace, .ref { animation: lgIn .5s var(--lg-ease) both; }
+  .bench > :nth-child(2) { animation-delay: .05s; } .bench > :nth-child(3) { animation-delay: .1s; } .trace { animation-delay: .15s; } .ref { animation-delay: .2s; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="lg-bg" aria-hidden="true"><span></span></div>
+<header class="top">
+  <div class="brand">
+    <span class="mark">µ</span>
+    <h1>TinyCPU Workbench</h1>
+    <span class="spec">32-bit · R0–R3 · ZF SF CF OF · mem 0–239</span>
+  </div>
+  <div class="field">
+    <label for="example">Example</label>
+    <select id="example"></select>
+  </div>
+  <div class="field">
+    <label for="limit">Limit</label>
+    <input id="limit" class="mono num" type="number" min="1" max="1000000" value="10000">
+  </div>
+</header>
+
+<div class="status">
+  <span class="pill ready" id="pill">Ready</span>
+  <span class="msg" id="msg"></span>
+  <div class="controls" style="margin-left:auto">
+    <button class="btn" id="back" title="Undo the last executed instruction">◀ Back</button>
+    <button class="btn primary" id="step" title="Execute one instruction">Step <kbd>⌘↵</kbd></button>
+    <button class="btn" id="run">▶ Run</button>
+    <span class="speed"><input id="speed" type="range" min="1" max="60" value="8" aria-label="Steps per second"><span id="speedlbl">8/s</span></span>
+    <button class="btn" id="runend" title="Execute until HALT, an error, or the limit">⏭ To end <kbd>⇧⌘↵</kbd></button>
+    <button class="btn" id="reset">↺ Reset</button>
+    <label class="btn filebtn">Open .asm<input type="file" id="file" accept=".asm,.txt,.s"></label>
+  </div>
+</div>
+
+<main class="bench">
+  <section class="panel col-src">
+    <h2>Program <span class="sub" id="proginfo"></span></h2>
+    <div class="editor">
+      <div class="gutter" id="gutter"></div>
+      <div class="code-wrap">
+        <pre class="backdrop" id="backdrop" aria-hidden="true"></pre>
+        <textarea id="src" spellcheck="false" placeholder="LOAD R0, [INPUT]&#10;STORE [OUTPUT], R0&#10;HALT"></textarea>
+      </div>
+    </div>
+    <div class="hint">Edits re-assemble automatically. Labels look like <code>loop:</code>, comments start with <code>;</code>. Ports: <code>[INPUT]</code> = 240, <code>[OUTPUT]</code> = 241.</div>
+  </section>
+
+  <section class="col">
+    <div class="panel">
+      <h2>Execution</h2>
+      <div class="pcline">
+        <span class="big">PC <span id="pc">0</span><small id="pcline"></small></span>
+        <span class="ins none" id="nextins">—</span>
+      </div>
+      <div class="regs" id="regs"></div>
+    </div>
+    <div class="panel">
+      <h2>Flags <span class="sub">after the last ADD / SUB / CMP</span></h2>
+      <div class="flags" id="flags"></div>
+      <div class="jumps" id="jumps" title="Which conditional jumps would be taken with the current flags"></div>
+    </div>
+    <div class="panel">
+      <h2>Ports</h2>
+      <input id="input" class="mono inputfield" placeholder="input numbers, e.g. 3 10 20 30" autocomplete="off" aria-label="Input numbers">
+      <div class="io">
+        <div>
+          <h3>Input <span class="addr">[240]</span></h3>
+          <div class="queue" id="inq"></div>
+        </div>
+        <div>
+          <h3>Output <span class="addr">[241]</span></h3>
+          <div class="queue" id="outq"></div>
+        </div>
+      </div>
+      <div class="answer" id="answer"></div>
+    </div>
+  </section>
+
+  <section class="panel col-mem">
+    <h2>Memory <span class="sub">240 cells, signed 32-bit</span></h2>
+    <div class="memwrap"><div class="mem" id="mem"></div></div>
+    <div class="memlegend">
+      <span><i></i> non-zero</span>
+      <span><i class="hot"></i> written by the last step</span>
+      <span><i class="ptr"></i> address held in a register</span>
+    </div>
+    <div class="ports"><span>240 INPUT · read-only</span><span>241 OUTPUT · write-only</span><span>242–255 reserved</span></div>
+  </section>
+</main>
+
+<button class="btn themebtn" id="themebtn" title="Switch light / dark">◐ Theme</button>
+
+<section class="panel trace">
+  <div class="bar">
+    <h2>Trace <span class="sub" id="tracecount"></span></h2>
+    <label><input type="checkbox" id="changesonly"> highlight changes only</label>
+    <span class="note">Click a row to rewind or fast-forward to that moment.</span>
+  </div>
+  <div class="tracewrap">
+    <table class="tr">
+      <thead><tr>
+        <th>#</th><th>PC</th><th class="l">Instruction</th>
+        <th>R0</th><th>R1</th><th>R2</th><th>R3</th>
+        <th>ZF</th><th>SF</th><th>CF</th><th>OF</th>
+        <th class="l">Output</th><th class="l">Memory</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="traceempty">No instructions executed yet. Press Step.</div>
+  </div>
+</section>
+
+<details class="panel ref" id="cheat" open>
+  <summary><h2>Cheat sheet <span class="sub">click to fold</span></h2></summary>
+  <div class="refgrid">
+    <div>
+      <h3>Instructions</h3>
+      <table class="rt">
+        <tr><td class="k">MOV R1, R0</td><td class="d">copy (R0 or a number like 5)</td></tr>
+        <tr><td class="k">LOAD R1, [10]</td><td class="d">memory cell 10 → R1</td></tr>
+        <tr><td class="k">STORE [10], R1</td><td class="d">R1 → memory cell 10</td></tr>
+        <tr><td class="k">LOAD R1, [INPUT]</td><td class="d">read the next input number</td></tr>
+        <tr><td class="k">STORE [OUTPUT], R1</td><td class="d">print R1</td></tr>
+        <tr><td class="k">ADD R1, R0</td><td class="d">R1 = R1 + R0 · sets flags</td></tr>
+        <tr><td class="k">SUB R1, R0</td><td class="d">R1 = R1 − R0 · sets flags</td></tr>
+        <tr><td class="k">CMP R0, R1</td><td class="d">compare R0 with R1 · sets flags only</td></tr>
+        <tr><td class="k">JMP name</td><td class="d">go to the line marked <code>name:</code></td></tr>
+        <tr><td class="k">HALT</td><td class="d">stop (required)</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>Jumps <span>· after CMP a, b</span></h3>
+      <table class="rt">
+        <tr><td class="k">JE</td><td class="d">if a = b</td></tr>
+        <tr><td class="k">JNE</td><td class="d">if a ≠ b</td></tr>
+        <tr><td class="k">JL</td><td class="d">if a &lt; b</td></tr>
+        <tr><td class="k">JLE</td><td class="d">if a ≤ b</td></tr>
+        <tr><td class="k">JG</td><td class="d">if a &gt; b</td></tr>
+        <tr><td class="k">JGE</td><td class="d">if a ≥ b</td></tr>
+      </table>
+      <div class="tip">A jump only knows what the last CMP / ADD / SUB said. Put the CMP right before it.</div>
+    </div>
+    <div>
+      <h3>Flags &amp; syntax</h3>
+      <table class="rt">
+        <tr><td class="k">ZF</td><td class="d">Zero — result was 0</td></tr>
+        <tr><td class="k">SF</td><td class="d">Sign — result was negative</td></tr>
+        <tr><td class="k">CF</td><td class="d">Carry — unsigned overflow / borrow</td></tr>
+        <tr><td class="k">OF</td><td class="d">Overflow — signed result didn't fit</td></tr>
+        <tr><td class="k">name:</td><td class="d">a label: names a line for jumps</td></tr>
+        <tr><td class="k">; text</td><td class="d">a comment</td></tr>
+        <tr><td class="k">[R2]</td><td class="d">the cell whose number is in R2</td></tr>
+      </table>
+    </div>
+  </div>
+</details>
+
+<script>
+// === TINYCPU CORE START (faithful port of src/tinycpu/assembler.py and cpu.py)
+class TinyCPUError extends Error {
+  constructor(message, line = null) {
+    super(message);
+    this.line = line; this.message = message;
+  }
+  get kind() { return "TinyCPU error"; }
+  toString() { return `${this.kind}${this.line ? ` (line ${this.line})` : ""}: ${this.message}`; }
+}
+class AsmSyntaxError extends TinyCPUError { get kind() { return "Syntax error"; } }
+class UnknownInstruction extends TinyCPUError { get kind() { return "Unknown instruction"; } }
+class OperandError extends TinyCPUError { get kind() { return "Operand error"; } }
+class RegisterError extends TinyCPUError { get kind() { return "Unknown register"; } }
+class LabelError extends TinyCPUError { get kind() { return "Label error"; } }
+class MemoryAddressError extends TinyCPUError { get kind() { return "Invalid memory address"; } }
+class IOOperationError extends TinyCPUError { get kind() { return "Invalid I/O operation"; } }
+class InputExhausted extends TinyCPUError { get kind() { return "Input exhausted"; } }
+class PCError extends TinyCPUError { get kind() { return "PC out of program"; } }
+class InstructionLimit extends TinyCPUError { get kind() { return "Instruction limit exceeded"; } }
+class NoHalt extends TinyCPUError { get kind() { return "Missing HALT"; } }
+
+const REG = /^R[0-3]$/i, REG_LIKE = /^R\d+$/i, LABEL = /^[A-Za-z_][A-Za-z_0-9]*$/, INT = /^[+-]?\d+$/;
+const ARITY = { MOV: 2, LOAD: 2, STORE: 2, ADD: 2, SUB: 2, CMP: 2, JMP: 1, JE: 1, JNE: 1, JL: 1, JLE: 1, JG: 1, JGE: 1, JC: 1, JNC: 1, HALT: 0 };
+const JUMPS = new Set(Object.keys(ARITY).filter(k => ARITY[k] === 1));
+const I32_MIN = -(2 ** 31), I32_MAX = 2 ** 31 - 1;
+
+function parseRegister(token, line) {
+  if (REG.test(token)) return token.toUpperCase();
+  if (REG_LIKE.test(token)) throw new RegisterError(`${token}: valid registers are R0–R3`, line);
+  throw new OperandError(`expected a register R0–R3, got '${token}'`, line);
+}
+function parseSource(token, line) {
+  if (REG.test(token)) return token.toUpperCase();
+  if (REG_LIKE.test(token)) throw new RegisterError(`${token}: valid registers are R0–R3`, line);
+  if (INT.test(token)) {
+    const n = BigInt(token);
+    if (n < BigInt(I32_MIN) || n > BigInt(I32_MAX)) throw new OperandError("immediate is outside the signed 32-bit range", line);
+    return Number(n);
+  }
+  throw new OperandError(`expected a register or decimal integer, got '${token}'`, line);
+}
+function parseAddress(token, line, writing) {
+  if (!token.startsWith("[") || !token.endsWith("]")) throw new OperandError(`expected an address in [brackets], got '${token}'`, line);
+  const inner = token.slice(1, -1).trim().toUpperCase();
+  if (REG.test(inner)) return inner;
+  if (REG_LIKE.test(inner)) throw new RegisterError(`${inner}: valid registers are R0–R3`, line);
+  let addr;
+  if (inner === "INPUT") addr = 240;
+  else if (inner === "OUTPUT") addr = 241;
+  else if (INT.test(inner)) addr = Number(BigInt(inner));
+  else throw new OperandError(`unknown address '${inner}'`, line);
+  if (!(addr >= 0 && addr <= 255)) throw new MemoryAddressError(`address ${addr} is outside 0..255`, line);
+  if (addr >= 242) throw new MemoryAddressError(`address ${addr} is reserved`, line);
+  if (writing && addr === 240) throw new IOOperationError("writing to INPUT is forbidden", line);
+  if (!writing && addr === 241) throw new IOOperationError("reading from OUTPUT is forbidden", line);
+  return addr;
+}
+
+function assemble(source) {
+  const labels = new Map();
+  const rows = [];
+  source.split(/\r?\n/).forEach((raw, i) => {
+    const number = i + 1;
+    let code = raw.split(";", 1)[0].trim();
+    while (code.includes(":")) {
+      const idx = code.indexOf(":");
+      const name = code.slice(0, idx).trim();
+      const rest = code.slice(idx + 1);
+      if (!LABEL.test(name)) throw new AsmSyntaxError("invalid label", number);
+      const key = name.toUpperCase();
+      if (labels.has(key)) throw new LabelError(`label ${name} is defined more than once`, number);
+      labels.set(key, rows.length);
+      code = rest.trim();
+    }
+    if (code) rows.push([code, number, raw.trim()]);
+  });
+  const instructions = [];
+  for (const [code, line, raw] of rows) {
+    const m = code.match(/^(\S+)(?:\s+(.*))?$/s);
+    const opcode = m[1].toUpperCase();
+    if (!(opcode in ARITY)) throw new UnknownInstruction(opcode, line);
+    const tail = (m[2] || "").trim();
+    const args = tail ? tail.split(",").map(x => x.trim()) : [];
+    if (args.length !== ARITY[opcode] || args.some(x => !x)) throw new OperandError(`${opcode}: expected ${ARITY[opcode]} operand(s), separated by a comma`, line);
+    let parsed;
+    if (JUMPS.has(opcode)) {
+      const key = args[0].toUpperCase();
+      if (!LABEL.test(key)) throw new OperandError("expected a jump label", line);
+      if (!labels.has(key)) throw new LabelError(`label ${args[0]} is undefined`, line);
+      parsed = [labels.get(key)];
+    } else if (opcode === "HALT") parsed = [];
+    else if (opcode === "LOAD") parsed = [parseRegister(args[0], line), parseAddress(args[1], line, false)];
+    else if (opcode === "STORE") parsed = [parseAddress(args[0], line, true), parseRegister(args[1], line)];
+    else parsed = [parseRegister(args[0], line), parseSource(args[1], line)];
+    instructions.push({ opcode, operands: parsed, line, source: raw });
+  }
+  return { instructions, labels: [...labels.entries()] };
+}
+
+class TinyCPU {
+  constructor(inputs = [], instructionLimit = 10000) {
+    if (instructionLimit < 1) throw new Error("instruction_limit must be positive");
+    this.inputs = inputs.slice();
+    this.instructionLimit = instructionLimit;
+    this.registers = [0, 0, 0, 0];
+    this.memory = new Array(240).fill(0);
+    this.flags = { ZF: false, SF: false, CF: false, OF: false };
+    this.pc = 0; this.steps = 0; this.inputPosition = 0;
+    this.outputs = [];
+    this.halted = false;
+    this.program = null;
+  }
+  load(program) { this.program = program; }
+  value(operand) { return typeof operand === "string" ? this.registers[+operand[1]] : operand; }
+  address(operand, writing, line) {
+    const address = this.value(operand);
+    if (!(address >= 0 && address <= 255)) throw new MemoryAddressError(`address ${address} is outside 0..255`, line);
+    if (address >= 242) throw new MemoryAddressError(`address ${address} is reserved`, line);
+    if (writing && address === 240) throw new IOOperationError("writing to INPUT is forbidden", line);
+    if (!writing && address === 241) throw new IOOperationError("reading from OUTPUT is forbidden", line);
+    return address;
+  }
+  arithmetic(left, right, subtract) {
+    const a = left >>> 0, b = right >>> 0;
+    const raw = subtract ? a - b : a + b;
+    const result = raw >>> 0;
+    const r = result | 0, ai = a | 0, bi = b | 0;
+    this.flags.ZF = result === 0;
+    this.flags.SF = r < 0;
+    this.flags.CF = subtract ? a < b : raw > 0xFFFFFFFF;
+    this.flags.OF = subtract ? (((ai ^ bi) & (ai ^ r)) < 0) : (((~(ai ^ bi)) & (ai ^ r)) < 0);
+    return r;
+  }
+  step(program = null) {
+    if (program !== null) this.load(program);
+    if (this.program === null) throw new Error("load a program first");
+    if (this.halted) return null;
+    const p = this.program;
+    if (this.pc === p.instructions.length) throw new NoHalt("program ended without HALT", p.instructions.length ? p.instructions[p.instructions.length - 1].line : null);
+    if (this.pc < 0 || this.pc > p.instructions.length) throw new PCError(`PC=${this.pc}`);
+    const ins = p.instructions[this.pc];
+    if (this.steps >= this.instructionLimit) throw new InstructionLimit(`limit ${this.instructionLimit}`, ins.line);
+    const op = ins.opcode, args = ins.operands;
+    const before = this.outputs.length;
+    const oldPc = this.pc;
+    let memWrite = null, jumpTaken = null, inputValue = null;
+    this.pc += 1;
+    if (op === "MOV") this.registers[+args[0][1]] = this.value(args[1]) | 0;
+    else if (op === "LOAD") {
+      const addr = this.address(args[1], false, ins.line);
+      let value;
+      if (addr === 240) {
+        if (this.inputPosition >= this.inputs.length) throw new InputExhausted("no more input integers", ins.line);
+        value = this.inputs[this.inputPosition];
+        this.inputPosition += 1;
+        inputValue = value;
+      } else value = this.memory[addr];
+      this.registers[+args[0][1]] = value | 0;
+    } else if (op === "STORE") {
+      const addr = this.address(args[0], true, ins.line);
+      const value = this.registers[+args[1][1]];
+      if (addr === 241) this.outputs.push(value);
+      else { memWrite = { addr, old: this.memory[addr], value }; this.memory[addr] = value; }
+    } else if (op === "ADD" || op === "SUB" || op === "CMP") {
+      const reg = +args[0][1];
+      const value = this.arithmetic(this.registers[reg], this.value(args[1]), op !== "ADD");
+      if (op !== "CMP") this.registers[reg] = value;
+    } else if (op === "HALT") this.halted = true;
+    else {
+      const f = this.flags;
+      const take = { JMP: true, JE: f.ZF, JNE: !f.ZF, JL: f.SF !== f.OF, JLE: f.ZF || f.SF !== f.OF,
+        JG: !f.ZF && f.SF === f.OF, JGE: f.SF === f.OF, JC: f.CF, JNC: !f.CF }[op];
+      jumpTaken = take;
+      if (take) this.pc = args[0];
+    }
+    this.steps += 1;
+    return { number: this.steps, pc: oldPc, instruction: ins, registers: this.registers.slice(),
+      flags: [this.flags.ZF, this.flags.SF, this.flags.CF, this.flags.OF],
+      newOutputs: this.outputs.slice(before), memWrite, jumpTaken, inputValue };
+  }
+  run(program = null) {
+    if (program !== null) this.load(program);
+    while (!this.halted) this.step();
+    return { outputs: this.outputs.slice(), steps: this.steps, registers: this.registers.slice(),
+      flags: [this.flags.ZF, this.flags.SF, this.flags.CF, this.flags.OF] };
+  }
+}
+const JUMP_COND = {
+  JE: ["ZF", f => f.ZF], JNE: ["not ZF", f => !f.ZF],
+  JL: ["SF ≠ OF", f => f.SF !== f.OF], JLE: ["ZF or SF ≠ OF", f => f.ZF || f.SF !== f.OF],
+  JG: ["not ZF and SF = OF", f => !f.ZF && f.SF === f.OF], JGE: ["SF = OF", f => f.SF === f.OF],
+  JC: ["CF", f => f.CF], JNC: ["not CF", f => !f.CF],
+};
+if (typeof module !== "undefined") module.exports = { assemble, TinyCPU, TinyCPUError };
+// === TINYCPU CORE END
+</script>
+
+<script>
+(() => {
+  const EXAMPLES = {
+    "sum": { input: "2 3", src:
+`; add two numbers
+LOAD R0, [INPUT]
+LOAD R1, [INPUT]
+ADD R0, R1
+STORE [OUTPUT], R0
+HALT` },
+    "max": { input: "2 7", src:
+`; get maximum of two numbers
+LOAD R0, [INPUT]
+LOAD R1, [INPUT]
+CMP R0, R1
+JGE done
+MOV R0, R1
+done: STORE [OUTPUT], R0
+HALT` },
+    "sum_1_to_n": { input: "4", src:
+`; sum 1 + 2 + ... + n
+LOAD R0, [INPUT]
+MOV R1, 0
+loop: CMP R0, 0
+JLE done
+ADD R1, R0
+SUB R0, 1
+JMP loop
+done: STORE [OUTPUT], R1
+HALT` },
+    "reverse": { input: "3 10 20 30", src:
+`; read n, then n numbers; print them in reverse
+; uses register-indirect addressing: [R2]
+LOAD R0, [INPUT]      ; n
+MOV R2, 0             ; write pointer
+fill: CMP R0, 0
+JLE dump
+LOAD R1, [INPUT]
+STORE [R2], R1        ; memory[R2] = R1
+ADD R2, 1
+SUB R0, 1
+JMP fill
+dump: CMP R2, 0
+JLE end
+SUB R2, 1
+LOAD R1, [R2]         ; R1 = memory[R2]
+STORE [OUTPUT], R1
+JMP dump
+end: HALT` },
+    "overflow": { input: "", src:
+`; 2147483647 + 1 wraps around: watch OF and SF
+MOV R0, 2147483647
+ADD R0, 1
+STORE [OUTPUT], R0
+; 0 - 1 sets CF (borrow) and SF
+MOV R1, 0
+SUB R1, 1
+STORE [OUTPUT], R1
+; -1 + 1 gives 0: ZF and CF
+MOV R2, -1
+ADD R2, 1
+STORE [OUTPUT], R2
+HALT` },
+  };
+  const FLAG_MEANING = { ZF: "result = 0", SF: "result < 0 (bit 31)", CF: "unsigned carry / borrow", OF: "signed overflow" };
+
+  const $ = id => document.getElementById(id);
+  const el = {
+    src: $("src"), backdrop: $("backdrop"), gutter: $("gutter"), input: $("input"), limit: $("limit"),
+    example: $("example"), pill: $("pill"), msg: $("msg"), back: $("back"), step: $("step"), run: $("run"),
+    runend: $("runend"), reset: $("reset"), speed: $("speed"), speedlbl: $("speedlbl"), file: $("file"),
+    pc: $("pc"), pcline: $("pcline"), nextins: $("nextins"), regs: $("regs"), flags: $("flags"), jumps: $("jumps"),
+    inq: $("inq"), outq: $("outq"), answer: $("answer"), mem: $("mem"), tbody: $("tbody"),
+    tracecount: $("tracecount"), traceempty: $("traceempty"), changesonly: $("changesonly"), proginfo: $("proginfo"),
+  };
+
+  // ---------- state ----------
+  let cpu = null, program = null, asmError = null, runError = null;
+  let history = [];   // one record per executed step, for stepping back
+  let trace = [];     // display rows
+  let inputs = [];
+  let timer = null;
+  let lastInfo = null;
+  const TRACE_CAP = 2500;
+
+  const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const hex = n => "0x" + (n >>> 0).toString(16).toUpperCase().padStart(8, "0");
+
+  // ---------- assembling / resetting ----------
+  function parseInputs(text) {
+    const toks = text.trim() ? text.trim().split(/[\s,]+/) : [];
+    return toks.map(t => {
+      if (!INT.test(t)) throw new Error(`input must be whitespace-separated integers, got '${t}'`);
+      return Number(BigInt.asIntN(32, BigInt(t)));
+    });
+  }
+
+  function reset() {
+    stopRun();
+    history = []; trace = []; runError = null; lastInfo = null;
+    asmError = null; program = null; cpu = null;
+    try { program = assemble(el.src.value); }
+    catch (e) { asmError = e; }
+    try { inputs = parseInputs(el.input.value); }
+    catch (e) { asmError = asmError || e; inputs = []; }
+    const limit = Math.max(1, Math.min(1000000, Number(el.limit.value) || 10000));
+    if (program) { cpu = new TinyCPU(inputs, limit); cpu.load(program); }
+    renderAll();
+  }
+
+  // ---------- stepping ----------
+  function doStep(quiet = false) {
+    if (!cpu || cpu.halted || runError) return false;
+    const before = { pc: cpu.pc, steps: cpu.steps, regs: cpu.registers.slice(), flags: { ...cpu.flags },
+      inputPosition: cpu.inputPosition, outputsLen: cpu.outputs.length, halted: cpu.halted };
+    let info;
+    try { info = cpu.step(); }
+    catch (e) {
+      if (!(e instanceof TinyCPUError)) throw e;
+      // roll back the partial step so the display shows the state *before* the failing instruction
+      Object.assign(cpu, { pc: before.pc, steps: before.steps, inputPosition: before.inputPosition, halted: before.halted });
+      cpu.registers = before.regs.slice(); Object.assign(cpu.flags, before.flags); cpu.outputs.length = before.outputsLen;
+      runError = e;
+      trace.push({ error: e, number: cpu.steps + 1, pc: cpu.pc, source: cpu.program.instructions[cpu.pc]?.source ?? "" });
+      if (!quiet) renderAll();
+      return false;
+    }
+    if (!info) return false;
+    history.push({ ...before, memWrite: info.memWrite });
+    lastInfo = info;
+    trace.push({
+      number: info.number, pc: info.pc, source: info.instruction.source,
+      regs: info.registers, prevRegs: before.regs, flags: info.flags,
+      prevFlags: [before.flags.ZF, before.flags.SF, before.flags.CF, before.flags.OF],
+      out: info.newOutputs, memWrite: info.memWrite, jumpTaken: info.jumpTaken, halted: cpu.halted,
+    });
+    if (!quiet) renderAll();
+    return true;
+  }
+
+  function doBack(quiet = false) {
+    if (!cpu || !history.length) return false;
+    if (runError) { runError = null; trace.pop(); if (!quiet) renderAll(); return true; }
+    const rec = history.pop();
+    Object.assign(cpu, { pc: rec.pc, steps: rec.steps, inputPosition: rec.inputPosition, halted: rec.halted });
+    cpu.registers = rec.regs.slice(); Object.assign(cpu.flags, rec.flags); cpu.outputs.length = rec.outputsLen;
+    if (rec.memWrite) cpu.memory[rec.memWrite.addr] = rec.memWrite.old;
+    trace.pop();
+    lastInfo = null;
+    if (!quiet) renderAll();
+    return true;
+  }
+
+  function goTo(stepNumber) {
+    stopRun();
+    while (cpu && cpu.steps > stepNumber && doBack(true)) {}
+    while (cpu && cpu.steps < stepNumber && doStep(true)) {}
+    renderAll();
+  }
+
+  function runToEnd() {
+    stopRun();
+    let n = 0;
+    while (doStep(true) && n++ < 2000000) {}
+    renderAll();
+  }
+
+  function startRun() {
+    if (!cpu || cpu.halted || runError) return;
+    stopRun();
+    const tick = () => {
+      if (!doStep()) { stopRun(); renderStatus(); }
+    };
+    timer = setInterval(tick, Math.round(1000 / Number(el.speed.value)));
+    el.run.textContent = "⏸ Pause";
+    renderStatus();
+  }
+  function stopRun() {
+    if (timer) { clearInterval(timer); timer = null; }
+    el.run.textContent = "▶ Run";
+  }
+
+  // ---------- rendering ----------
+  function renderAll() {
+    renderEditorMarks(); renderStatus(); renderExec(); renderFlags(); renderIO(); renderMem(); renderTrace();
+  }
+
+  function renderStatus() {
+    const running = !!timer;
+    let cls = "ready", text = "Ready", msg = "", err = false;
+    if (asmError) { cls = "error"; text = "Won't assemble"; msg = asmError.toString ? asmError.toString() : String(asmError); err = true; }
+    else if (runError) { cls = "error"; text = `Stopped at step ${cpu.steps + 1}`; msg = runError.toString(); err = true; }
+    else if (cpu && cpu.halted) { cls = "halted"; text = `Halted after ${cpu.steps} step${cpu.steps === 1 ? "" : "s"}`; msg = `Output: ${cpu.outputs.join(" ") || "—"}`; }
+    else if (running) { cls = "running"; text = `Running · step ${cpu.steps}`; }
+    else if (cpu && cpu.steps) { cls = "ready"; text = `Paused · step ${cpu.steps}`; }
+    el.pill.className = "pill " + cls; el.pill.textContent = text;
+    el.msg.textContent = msg; el.msg.className = "msg" + (err ? " err" : "");
+    const can = cpu && !cpu.halted && !runError && !asmError;
+    el.step.disabled = !can; el.run.disabled = !can; el.runend.disabled = !can;
+    el.back.disabled = !cpu || (!history.length && !runError);
+    el.proginfo.textContent = program ? `${program.instructions.length} instruction${program.instructions.length === 1 ? "" : "s"}, ${program.labels.length} label${program.labels.length === 1 ? "" : "s"}` : "";
+  }
+
+  function renderEditorMarks() {
+    const lines = el.src.value.split("\n");
+    const pcLine = (cpu && !cpu.halted && !runError && program && cpu.pc < program.instructions.length) ? program.instructions[cpu.pc].line : null;
+    const errLine = asmError?.line ?? runError?.line ?? null;
+    let bd = "", gt = "";
+    lines.forEach((t, i) => {
+      const n = i + 1;
+      const cls = n === errLine ? "err" : n === pcLine ? "pc" : "";
+      bd += `<span class="ln ${cls}">${esc(t) || " "}</span>`;
+      gt += `<div class="g ${cls}">${n}</div>`;
+    });
+    el.backdrop.innerHTML = bd; el.gutter.innerHTML = gt;
+    syncScroll();
+  }
+  function syncScroll() {
+    el.backdrop.scrollTop = el.src.scrollTop; el.backdrop.scrollLeft = el.src.scrollLeft;
+    el.gutter.scrollTop = el.src.scrollTop;
+  }
+
+  function renderExec() {
+    if (!cpu) { el.pc.textContent = "—"; el.pcline.textContent = ""; el.nextins.textContent = asmError ? "fix the program first" : "—"; el.nextins.className = "ins none"; }
+    else {
+      el.pc.textContent = cpu.pc;
+      const ins = program.instructions[cpu.pc];
+      if (cpu.halted) { el.nextins.textContent = "halted"; el.nextins.className = "ins none"; el.pcline.textContent = ""; }
+      else if (runError) { el.nextins.textContent = "error on this instruction"; el.nextins.className = "ins none"; el.pcline.textContent = ins ? ` line ${ins.line}` : ""; }
+      else if (ins) { el.nextins.textContent = "next: " + ins.source; el.nextins.className = "ins"; el.pcline.textContent = ` line ${ins.line}`; }
+      else { el.nextins.textContent = "past the last instruction (no HALT)"; el.nextins.className = "ins none"; el.pcline.textContent = ""; }
+    }
+    const regs = cpu ? cpu.registers : [0, 0, 0, 0];
+    const prev = lastInfo && history.length ? history[history.length - 1].regs : regs;
+    el.regs.innerHTML = regs.map((v, i) =>
+      `<div class="reg${v !== prev[i] ? " chg" : ""}"><div class="name">R${i}</div><div class="val">${v}</div><div class="hex">${hex(v)}</div></div>`).join("");
+  }
+
+  function renderFlags() {
+    const f = cpu ? cpu.flags : { ZF: false, SF: false, CF: false, OF: false };
+    const pf = lastInfo && history.length ? history[history.length - 1].flags : f;
+    el.flags.innerHTML = Object.keys(f).map(k =>
+      `<div class="flag${f[k] ? " on" : ""}${f[k] !== pf[k] ? " chg" : ""}"><div class="n">${k} <span>${f[k] ? 1 : 0}</span></div><div class="m">${FLAG_MEANING[k]}</div></div>`).join("");
+    el.jumps.innerHTML = Object.entries(JUMP_COND).map(([j, [cond, fn]]) =>
+      `<span class="jump${fn(f) ? " on" : ""}" title="${j}: taken when ${cond}">${j}</span>`).join("");
+  }
+
+  function renderIO() {
+    const pos = cpu ? cpu.inputPosition : 0;
+    el.inq.innerHTML = inputs.length ? inputs.map((v, i) =>
+      `<span class="tok${i < pos ? " used" : i === pos ? " next" : ""}">${v}</span>`).join("") : `<span class="empty">no input</span>`;
+    const outs = cpu ? cpu.outputs : [];
+    const fresh = lastInfo ? lastInfo.newOutputs.length : 0;
+    el.outq.innerHTML = outs.length ? outs.map((v, i) =>
+      `<span class="tok${i >= outs.length - fresh ? " new" : ""}">${v}</span>`).join("") : `<span class="empty">nothing yet</span>`;
+    el.answer.innerHTML = outs.length ? `stdout would be: <b>${outs.join("\\n").replace(/\\n/g, " ⏎ ")}</b>` : "";
+  }
+
+  function renderMem() {
+    const mem = cpu ? cpu.memory : new Array(240).fill(0);
+    const hot = lastInfo?.memWrite?.addr ?? -1;
+    const ptrs = new Set(cpu ? cpu.registers.filter(v => v >= 0 && v < 240) : []);
+    let h = `<div class="h"></div>` + Array.from({ length: 16 }, (_, c) => `<div class="h">+${c}</div>`).join("");
+    for (let r = 0; r < 15; r++) {
+      h += `<div class="a">${r * 16}</div>`;
+      for (let c = 0; c < 16; c++) {
+        const a = r * 16 + c, v = mem[a];
+        const cls = (a === hot ? " hot" : v !== 0 ? " nz" : "") + (ptrs.has(a) ? " ptr" : "");
+        h += `<div class="c${cls}" title="[${a}] = ${v}${ptrs.has(a) ? " · a register holds this address" : ""}">${v}</div>`;
+      }
+    }
+    el.mem.innerHTML = h;
+  }
+
+  function renderTrace() {
+    const changesOnly = el.changesonly.checked;
+    const shown = trace.slice(-TRACE_CAP);
+    el.traceempty.hidden = trace.length > 0;
+    el.tracecount.textContent = trace.length ? (trace.length > TRACE_CAP ? `last ${TRACE_CAP} of ${trace.length} steps` : `${trace.length} step${trace.length === 1 ? "" : "s"}`) : "";
+    const cur = cpu ? cpu.steps : 0;
+    let h = "";
+    for (const row of shown) {
+      if (row.error) {
+        h += `<tr class="errrow" data-n="${row.number - 1}"><td>${row.number}</td><td>${row.pc}</td><td class="l">${esc(row.source)}</td><td colspan="10" class="l">${esc(row.error.toString())}</td></tr>`;
+        continue;
+      }
+      const regCells = row.regs.map((v, i) => {
+        const chg = v !== row.prevRegs[i];
+        return `<td class="${chg ? "chg" : changesOnly ? "dim" : ""}">${v}</td>`;
+      }).join("");
+      const flagCells = row.flags.map((v, i) => {
+        const chg = v !== row.prevFlags[i];
+        return `<td class="f${v ? " on" : ""}${chg ? " chg" : changesOnly && !v ? " dim" : ""}">${v ? 1 : 0}</td>`;
+      }).join("");
+      const out = row.out.length ? row.out.join(" ") : "";
+      const memw = row.memWrite ? `[${row.memWrite.addr}] ← ${row.memWrite.value}` : row.jumpTaken === true ? "jump taken" : row.jumpTaken === false ? "not taken" : row.halted ? "HALT" : "";
+      h += `<tr class="${row.number === cur ? "cur" : ""}" data-n="${row.number}"><td>${row.number}</td><td>${row.pc}</td><td class="l">${esc(row.source)}</td>${regCells}${flagCells}<td class="out">${out}</td><td class="memw">${memw}</td></tr>`;
+    }
+    el.tbody.innerHTML = h;
+    const curRow = el.tbody.querySelector("tr.cur");
+    if (curRow) curRow.scrollIntoView({ block: "nearest" });
+  }
+
+  // ---------- wiring ----------
+  let debounce = null;
+  el.src.addEventListener("input", () => { renderEditorMarks(); clearTimeout(debounce); debounce = setTimeout(() => { reset(); save(); }, 250); });
+  el.src.addEventListener("scroll", syncScroll);
+  el.src.addEventListener("keydown", e => {
+    if (e.key === "Tab") { e.preventDefault(); const s = el.src.selectionStart, t = el.src.selectionEnd; el.src.setRangeText("    ", s, t, "end"); el.src.dispatchEvent(new Event("input")); }
+  });
+  el.input.addEventListener("input", () => { clearTimeout(debounce); debounce = setTimeout(() => { reset(); save(); }, 250); });
+  el.limit.addEventListener("change", reset);
+  el.step.addEventListener("click", () => { stopRun(); doStep(); });
+  el.back.addEventListener("click", () => { stopRun(); doBack(); });
+  el.run.addEventListener("click", () => timer ? (stopRun(), renderStatus()) : startRun());
+  el.runend.addEventListener("click", runToEnd);
+  el.reset.addEventListener("click", reset);
+  el.speed.addEventListener("input", () => { el.speedlbl.textContent = el.speed.value + "/s"; if (timer) startRun(); });
+  el.changesonly.addEventListener("change", renderTrace);
+  el.tbody.addEventListener("click", e => { const tr = e.target.closest("tr"); if (tr) goTo(Number(tr.dataset.n)); });
+  el.file.addEventListener("change", () => {
+    const f = el.file.files[0]; if (!f) return;
+    f.text().then(t => { el.src.value = t; el.example.value = ""; reset(); save(); });
+    el.file.value = "";
+  });
+  document.addEventListener("keydown", e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") { e.preventDefault(); stopRun(); e.shiftKey ? runToEnd() : doStep(); }
+  });
+
+  el.example.innerHTML = `<option value="">— your program —</option>` + Object.keys(EXAMPLES).map(k => `<option value="${k}">${k}.asm</option>`).join("");
+  el.example.addEventListener("change", () => {
+    const ex = EXAMPLES[el.example.value]; if (!ex) return;
+    el.src.value = ex.src; el.input.value = ex.input; reset(); save();
+  });
+
+  function save() {
+    try { localStorage.setItem("tinycpu.src", el.src.value); localStorage.setItem("tinycpu.input", el.input.value); } catch (_) {}
+  }
+  function boot(data) {
+    let src = data.src, input = data.input, fresh = false;
+    if (src == null) { try { src = localStorage.getItem("tinycpu.src"); input = localStorage.getItem("tinycpu.input"); } catch (_) {} }
+    if (src == null) { src = EXAMPLES.sum_1_to_n.src; input = EXAMPLES.sum_1_to_n.input; el.example.value = "sum_1_to_n"; fresh = true; }
+    el.src.value = src; el.input.value = input ?? "";
+    el.speedlbl.textContent = el.speed.value + "/s";
+    reset();
+    const target = data.steps ?? (fresh ? 6 : 0);
+    if (target) goTo(target);
+  }
+  const cheat = document.getElementById("cheat");
+  try { if (localStorage.getItem("tinycpu.cheat") === "closed") cheat.open = false; } catch (_) {}
+  cheat.addEventListener("toggle", () => { try { localStorage.setItem("tinycpu.cheat", cheat.open ? "open" : "closed"); } catch (_) {} });
+  const themeBtn = document.getElementById("themebtn");
+  const applyTheme = t => { if (t) document.documentElement.setAttribute("data-theme", t); else document.documentElement.removeAttribute("data-theme"); };
+  try { applyTheme(localStorage.getItem("tinycpu.theme") || ""); } catch (_) {}
+  themeBtn.addEventListener("click", () => {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const dark = cur ? cur === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    const next = dark ? "light" : "dark";
+    applyTheme(next);
+    try { localStorage.setItem("tinycpu.theme", next); } catch (_) {}
+  });
+  window.claude?.hot?.snapshot?.(() => ({ src: el.src.value, input: el.input.value, steps: cpu ? cpu.steps : 0 }));
+  window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
+})();
+</script>
