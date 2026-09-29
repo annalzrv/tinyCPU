@@ -9,14 +9,14 @@
     --lg-accent: #ff4f2e; --lg-accent-soft: rgba(255,79,46,.14); --lg-accent-ink: #ffffff; --lg-accent-deep: #b8321a;
     --lg-ok: #2fb46b; --lg-ok-soft: rgba(47,180,107,.16); --lg-ok-deep: #1d7d49;
     --lg-warn: #f4a11d; --lg-bad: #e0362f; --lg-bad-soft: rgba(224,54,47,.14);
-    --lg-page: #e9eef6;
+    --lg-page: #eceff4;
     --lg-glass: rgba(255,255,255,.58); --lg-glass-strong: rgba(255,255,255,.78); --lg-glass-hover: rgba(255,255,255,.72);
     --lg-stroke: rgba(255,255,255,.85); --lg-stroke-2: rgba(11,11,15,.08); --lg-highlight: rgba(255,255,255,.95);
     --lg-shadow: 0 1px 2px rgba(15,15,30,.04), 0 12px 40px -12px rgba(15,15,30,.18);
     --lg-shadow-lift: 0 2px 6px rgba(15,15,30,.06), 0 24px 60px -16px rgba(15,15,30,.28);
     --lg-field: rgba(255,255,255,.62); --lg-field-stroke: rgba(11,11,15,.10);
     --lg-inset: rgba(11,11,15,.045); --lg-inset-2: rgba(11,11,15,.09);
-    --lg-blob-1: #9fd3e6; --lg-blob-2: #b7c4ff; --lg-blob-3: #cfeedd;
+    --lg-blob-1: #c6d3e8; --lg-blob-2: #dcd6ec; --lg-blob-3: #cfe1df;
     --lg-r-xl: 28px; --lg-r-lg: 20px; --lg-r-md: 14px; --lg-r-sm: 10px;
     --lg-ease: cubic-bezier(.2,.8,.2,1);
   }
@@ -26,14 +26,14 @@
       --lg-accent: #ff6a4a; --lg-accent-soft: rgba(255,106,74,.18); --lg-accent-deep: #ffb09d;
       --lg-ok: #3ec97e; --lg-ok-soft: rgba(62,201,126,.18); --lg-ok-deep: #8ee8b4;
       --lg-bad: #ff6b63; --lg-bad-soft: rgba(255,107,99,.16);
-      --lg-page: #0b0f16;
+      --lg-page: #0d1017;
       --lg-glass: rgba(28,28,36,.55); --lg-glass-strong: rgba(34,34,44,.78); --lg-glass-hover: rgba(40,40,52,.66);
       --lg-stroke: rgba(255,255,255,.12); --lg-stroke-2: rgba(255,255,255,.08); --lg-highlight: rgba(255,255,255,.10);
       --lg-shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 48px -12px rgba(0,0,0,.6);
       --lg-shadow-lift: 0 2px 6px rgba(0,0,0,.4), 0 28px 70px -16px rgba(0,0,0,.7);
       --lg-field: rgba(255,255,255,.06); --lg-field-stroke: rgba(255,255,255,.12);
       --lg-inset: rgba(255,255,255,.05); --lg-inset-2: rgba(255,255,255,.10);
-      --lg-blob-1: #123e4d; --lg-blob-2: #1f2a5e; --lg-blob-3: #1c4a3c;
+      --lg-blob-1: #1b2536; --lg-blob-2: #262039; --lg-blob-3: #17292c;
     }
   }
   :root[data-theme="dark"] {
@@ -41,14 +41,14 @@
     --lg-accent: #ff6a4a; --lg-accent-soft: rgba(255,106,74,.18); --lg-accent-deep: #ffb09d;
     --lg-ok: #3ec97e; --lg-ok-soft: rgba(62,201,126,.18); --lg-ok-deep: #8ee8b4;
     --lg-bad: #ff6b63; --lg-bad-soft: rgba(255,107,99,.16);
-    --lg-page: #0b0f16;
+    --lg-page: #0d1017;
     --lg-glass: rgba(28,28,36,.55); --lg-glass-strong: rgba(34,34,44,.78); --lg-glass-hover: rgba(40,40,52,.66);
     --lg-stroke: rgba(255,255,255,.12); --lg-stroke-2: rgba(255,255,255,.08); --lg-highlight: rgba(255,255,255,.10);
     --lg-shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 48px -12px rgba(0,0,0,.6);
     --lg-shadow-lift: 0 2px 6px rgba(0,0,0,.4), 0 28px 70px -16px rgba(0,0,0,.7);
     --lg-field: rgba(255,255,255,.06); --lg-field-stroke: rgba(255,255,255,.12);
     --lg-inset: rgba(255,255,255,.05); --lg-inset-2: rgba(255,255,255,.10);
-    --lg-blob-1: #123e4d; --lg-blob-2: #1f2a5e; --lg-blob-3: #1c4a3c;
+    --lg-blob-1: #1b2536; --lg-blob-2: #262039; --lg-blob-3: #17292c;
   }
 
   /* the tracer's own semantic names, mapped onto the glass tokens */
@@ -72,7 +72,7 @@
 
   /* ambient mesh the glass refracts */
   .lg-bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-  .lg-bg::before, .lg-bg::after, .lg-bg > span { content: ""; position: absolute; border-radius: 50%; filter: blur(90px); opacity: .9; will-change: transform; }
+  .lg-bg::before, .lg-bg::after, .lg-bg > span { content: ""; position: absolute; border-radius: 50%; filter: blur(100px); opacity: .85; will-change: transform; }
   .lg-bg::before { width: 60vw; height: 60vw; left: -18vw; top: -22vw; background: var(--lg-blob-1); animation: lgDrift1 26s ease-in-out infinite alternate; }
   .lg-bg::after { width: 55vw; height: 55vw; right: -16vw; top: 8vh; background: var(--lg-blob-2); animation: lgDrift2 32s ease-in-out infinite alternate; }
   .lg-bg > span { width: 50vw; height: 50vw; left: 22vw; bottom: -28vw; background: var(--lg-blob-3); animation: lgDrift3 38s ease-in-out infinite alternate; }
@@ -209,20 +209,12 @@
   .jump { font-family: var(--mono); font-size: 12px; height: 24px; display: inline-flex; align-items: center; padding: 0 9px; border-radius: 999px; border: 1px solid var(--lg-stroke-2); color: var(--lg-text-3); background: var(--lg-field); }
   .jump.on { color: var(--lg-ok-deep); border-color: rgba(47,180,107,.4); background: var(--lg-ok-soft); font-weight: 700; }
 
-  .io { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  @media (max-width: 380px) { .io { grid-template-columns: 1fr; } }
-  .io h3 { margin: 0 0 6px; font-size: 11px; color: var(--lg-text-3); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
-  .io h3 .addr { font-family: var(--mono); font-weight: 400; letter-spacing: 0; text-transform: none; }
-  .queue { display: flex; flex-wrap: wrap; gap: 4px; min-height: 26px; }
-  .tok { font-family: var(--mono); font-size: 12px; height: 24px; display: inline-flex; align-items: center; padding: 0 8px; border-radius: 999px; border: 1px solid var(--lg-stroke-2); background: var(--lg-field); }
-  .tok.used { color: var(--lg-text-3); text-decoration: line-through; border-style: dashed; }
-  .tok.next { border-color: rgba(255,79,46,.4); color: var(--lg-accent-deep); background: var(--lg-accent-soft); }
-  .tok.new { border-color: rgba(47,180,107,.4); color: var(--lg-ok-deep); background: var(--lg-ok-soft); font-weight: 700; }
-  .queue .empty { color: var(--lg-text-3); font-size: 12px; align-self: center; }
-  .answer { font-family: var(--mono); font-size: 12px; color: var(--lg-text-2); }
-  .answer b { color: var(--lg-text); font-weight: 700; }
 
   .inputfield { width: 100%; height: 36px; font-size: 14px; padding: 0 12px; background: var(--lg-field); border: 1px solid var(--lg-field-stroke); border-radius: var(--lg-r-sm); outline: none; -webkit-appearance: none; appearance: none; transition: border-color .2s, box-shadow .2s; }
+  .iolabel { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--lg-text-3); font-weight: 700; margin-top: 2px; }
+  .iolabel .addr { font-family: var(--mono); font-weight: 400; letter-spacing: 0; text-transform: none; }
+  .inputfield.out { color: var(--lg-text); background: var(--lg-inset); cursor: text; }
+  .inputfield.out.fresh { color: var(--lg-ok-deep); font-weight: 700; }
   .inputfield:focus { border-color: var(--lg-accent); box-shadow: 0 0 0 4px var(--lg-accent-soft); }
 
   /* ---------- memory ---------- */
@@ -339,7 +331,7 @@
 
 <main class="bench">
   <section class="panel col-src">
-    <h2>Program <span class="sub" id="proginfo"></span></h2>
+    <h2>Program</h2>
     <div class="editor">
       <div class="gutter" id="gutter"></div>
       <div class="code-wrap">
@@ -347,7 +339,6 @@
         <textarea id="src" spellcheck="false" placeholder="LOAD R0, [INPUT]&#10;STORE [OUTPUT], R0&#10;HALT"></textarea>
       </div>
     </div>
-    <div class="hint">Edits re-assemble automatically. Labels look like <code>loop:</code>, comments start with <code>;</code>. Ports: <code>[INPUT]</code> = 240, <code>[OUTPUT]</code> = 241.</div>
   </section>
 
   <section class="col">
@@ -366,18 +357,10 @@
     </div>
     <div class="panel">
       <h2>Ports</h2>
-      <input id="input" class="mono inputfield" placeholder="input numbers, e.g. 3 10 20 30" autocomplete="off" aria-label="Input numbers">
-      <div class="io">
-        <div>
-          <h3>Input <span class="addr">[240]</span></h3>
-          <div class="queue" id="inq"></div>
-        </div>
-        <div>
-          <h3>Output <span class="addr">[241]</span></h3>
-          <div class="queue" id="outq"></div>
-        </div>
-      </div>
-      <div class="answer" id="answer"></div>
+      <label class="iolabel" for="input">Input <span class="addr">[240]</span></label>
+      <input id="input" class="mono inputfield" placeholder="numbers, e.g. 3 10 20 30" autocomplete="off">
+      <label class="iolabel" for="output">Output <span class="addr">[241]</span></label>
+      <input id="output" class="mono inputfield out" readonly placeholder="nothing printed yet" aria-live="polite">
     </div>
   </section>
 
@@ -443,7 +426,6 @@
         <tr><td class="k">JG</td><td class="d">if a &gt; b</td></tr>
         <tr><td class="k">JGE</td><td class="d">if a ≥ b</td></tr>
       </table>
-      <div class="tip">A jump only knows what the last CMP / ADD / SUB said. Put the CMP right before it.</div>
     </div>
     <div>
       <h3>Flags &amp; syntax</h3>
@@ -730,8 +712,8 @@ HALT` },
     example: $("example"), pill: $("pill"), msg: $("msg"), back: $("back"), step: $("step"), run: $("run"),
     runend: $("runend"), reset: $("reset"), speed: $("speed"), speedlbl: $("speedlbl"), file: $("file"),
     pc: $("pc"), pcline: $("pcline"), nextins: $("nextins"), regs: $("regs"), flags: $("flags"), jumps: $("jumps"),
-    inq: $("inq"), outq: $("outq"), answer: $("answer"), mem: $("mem"), tbody: $("tbody"),
-    tracecount: $("tracecount"), traceempty: $("traceempty"), changesonly: $("changesonly"), proginfo: $("proginfo"),
+    output: $("output"), mem: $("mem"), tbody: $("tbody"),
+    tracecount: $("tracecount"), traceempty: $("traceempty"), changesonly: $("changesonly"),
   };
 
   // ---------- state ----------
@@ -858,7 +840,6 @@ HALT` },
     const can = cpu && !cpu.halted && !runError && !asmError;
     el.step.disabled = !can; el.run.disabled = !can; el.runend.disabled = !can;
     el.back.disabled = !cpu || (!history.length && !runError);
-    el.proginfo.textContent = program ? `${program.instructions.length} instruction${program.instructions.length === 1 ? "" : "s"}, ${program.labels.length} label${program.labels.length === 1 ? "" : "s"}` : "";
   }
 
   function renderEditorMarks() {
@@ -906,14 +887,9 @@ HALT` },
   }
 
   function renderIO() {
-    const pos = cpu ? cpu.inputPosition : 0;
-    el.inq.innerHTML = inputs.length ? inputs.map((v, i) =>
-      `<span class="tok${i < pos ? " used" : i === pos ? " next" : ""}">${v}</span>`).join("") : `<span class="empty">no input</span>`;
     const outs = cpu ? cpu.outputs : [];
-    const fresh = lastInfo ? lastInfo.newOutputs.length : 0;
-    el.outq.innerHTML = outs.length ? outs.map((v, i) =>
-      `<span class="tok${i >= outs.length - fresh ? " new" : ""}">${v}</span>`).join("") : `<span class="empty">nothing yet</span>`;
-    el.answer.innerHTML = outs.length ? `stdout would be: <b>${outs.join("\\n").replace(/\\n/g, " ⏎ ")}</b>` : "";
+    el.output.value = outs.join(" ");
+    el.output.classList.toggle("fresh", !!(lastInfo && lastInfo.newOutputs.length));
   }
 
   function renderMem() {
