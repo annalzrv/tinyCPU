@@ -7,7 +7,7 @@ import unittest
 from tinycpu import assemble, TinyCPU
 from tinycpu.errors import (TinyCPUError, RegisterError, LabelError, MemoryAddressError,
                             InputExhausted, InstructionLimit, NoHalt, IOError as TinyIOError)
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parent
 
 class AssemblerTests(unittest.TestCase):
     def test_case_comments_and_labels(self):
@@ -93,7 +93,7 @@ class CPUTests(unittest.TestCase):
 
 class CLITests(unittest.TestCase):
     def test_run_from_stdin_prints_only_output(self):
-        env={**os.environ,'PYTHONPATH':str(ROOT/'src')}
+        env={**os.environ,'PYTHONPATH':str(ROOT)}
         command=[sys.executable,'-m','tinycpu']
         help_result=subprocess.run(command+['--help'],capture_output=True,text=True,env=env)
         self.assertEqual(help_result.returncode,0)
@@ -104,7 +104,7 @@ class CLITests(unittest.TestCase):
         result=subprocess.run(command+['run',program,'--input','2 3'],capture_output=True,text=True,env=env)
         self.assertEqual((result.returncode,result.stdout,result.stderr),(0,'5\n',''))
     def test_multiple_outputs_and_errors(self):
-        env={**os.environ,'PYTHONPATH':str(ROOT/'src')}
+        env={**os.environ,'PYTHONPATH':str(ROOT)}
         command=[sys.executable,'-m','tinycpu','run']
         with tempfile.TemporaryDirectory() as directory:
             program=Path(directory)/'program.asm'

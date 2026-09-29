@@ -40,7 +40,6 @@ done: STORE [OUTPUT], R1
 HALT
 ```
 
-Specification: [docs/architecture.md](docs/architecture.md) · Syntax: [docs/assembly_syntax.md](docs/assembly_syntax.md)
 
 ## Examples
 
@@ -51,7 +50,7 @@ Specification: [docs/architecture.md](docs/architecture.md) · Syntax: [docs/ass
 The course's Python emulator, which the tracer matches. Python 3.11+.
 
 ```bash
-PYTHONPATH=src python3 -m tinycpu run examples/sum.asm --input "2 3"
-PYTHONPATH=src python3 -m tinycpu trace examples/max.asm --input "2 7"
-PYTHONPATH=src python3 -m tinycpu debug examples/max.asm --input "2 7"
+python3 -m tinycpu run examples/sum.asm --input "2 3"
+python3 -m tinycpu trace examples/max.asm --input "2 7"
+python3 -m tinycpu debug examples/max.asm --input "2 7"
 ```

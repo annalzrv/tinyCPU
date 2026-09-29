@@ -16,7 +16,7 @@
     --lg-shadow-lift: 0 2px 6px rgba(15,15,30,.06), 0 24px 60px -16px rgba(15,15,30,.28);
     --lg-field: rgba(255,255,255,.62); --lg-field-stroke: rgba(11,11,15,.10);
     --lg-inset: rgba(11,11,15,.045); --lg-inset-2: rgba(11,11,15,.09);
-    --lg-blob-1: #9ec9ff; --lg-blob-2: #eab4ff; --lg-blob-3: #9ff0d8;
+    --lg-blob-1: #9ec9ff; --lg-blob-2: #ffb3d6; --lg-blob-3: #9ff0d8;
     --lg-r-xl: 28px; --lg-r-lg: 20px; --lg-r-md: 14px; --lg-r-sm: 10px;
     --lg-ease: cubic-bezier(.2,.8,.2,1);
   }
@@ -33,7 +33,7 @@
       --lg-shadow-lift: 0 2px 6px rgba(0,0,0,.4), 0 28px 70px -16px rgba(0,0,0,.7);
       --lg-field: rgba(255,255,255,.06); --lg-field-stroke: rgba(255,255,255,.12);
       --lg-inset: rgba(255,255,255,.05); --lg-inset-2: rgba(255,255,255,.10);
-      --lg-blob-1: #2b4f8f; --lg-blob-2: #6a3990; --lg-blob-3: #1f6d5c;
+      --lg-blob-1: #2b4f8f; --lg-blob-2: #8f3a6e; --lg-blob-3: #1f6d5c;
     }
   }
   :root[data-theme="dark"] {
@@ -48,7 +48,7 @@
     --lg-shadow-lift: 0 2px 6px rgba(0,0,0,.4), 0 28px 70px -16px rgba(0,0,0,.7);
     --lg-field: rgba(255,255,255,.06); --lg-field-stroke: rgba(255,255,255,.12);
     --lg-inset: rgba(255,255,255,.05); --lg-inset-2: rgba(255,255,255,.10);
-    --lg-blob-1: #2b4f8f; --lg-blob-2: #6a3990; --lg-blob-3: #1f6d5c;
+    --lg-blob-1: #2b4f8f; --lg-blob-2: #8f3a6e; --lg-blob-3: #1f6d5c;
   }
 
   /* the tracer's own semantic names, mapped onto the glass tokens */
@@ -182,7 +182,7 @@
 
   /* ---------- CPU state ---------- */
   .pcline { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-  .pcline .big { font-family: var(--mono); font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+  .pcline .big { font-family: var(--mono); font-size: 17px; font-weight: 600; letter-spacing: -.02em; }
   .pcline .big small { font-size: 13px; color: var(--lg-text-2); font-weight: 400; margin-left: 4px; }
   .pcline .ins { font-family: var(--mono); font-size: 13px; color: var(--lg-accent-deep); background: var(--lg-accent-soft); padding: 3px 10px; border-radius: 999px; border: 1px solid transparent; }
   .pcline .ins.none { color: var(--lg-text-2); background: var(--lg-field); border-color: var(--lg-stroke-2); }
@@ -903,7 +903,12 @@ HALT` },
     }
     el.tbody.innerHTML = h;
     const curRow = el.tbody.querySelector("tr.cur");
-    if (curRow) curRow.scrollIntoView({ block: "nearest" });
+    if (curRow) {
+      const box = el.tbody.closest(".tracewrap");
+      const top = curRow.offsetTop - 34, bottom = curRow.offsetTop + curRow.offsetHeight;
+      if (top < box.scrollTop) box.scrollTop = top;
+      else if (bottom > box.scrollTop + box.clientHeight) box.scrollTop = bottom - box.clientHeight;
+    }
   }
 
   // ---------- wiring ----------

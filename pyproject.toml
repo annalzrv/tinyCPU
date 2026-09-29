@@ -17,8 +17,7 @@ notebook = ["jupyter>=1", "nbconvert>=7", "ipykernel>=6"]
 tinycpu = "tinycpu.cli:main"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+include = ["tinycpu*"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
-testpaths = ["tests"]
+testpaths = ["."]
